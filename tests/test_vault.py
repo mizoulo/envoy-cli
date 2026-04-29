@@ -35,6 +35,12 @@ def test_list_envs(vault):
     assert set(envs) == {"staging", "production"}
 
 
+def test_list_envs_empty_project(vault):
+    """list_envs should return an empty list for a project with no environments."""
+    envs = vault.list_envs("unknown-project")
+    assert envs == []
+
+
 def test_delete_removes_env(vault):
     vault.push(PROJECT, ENV_NAME, SAMPLE_ENV)
     vault.delete(PROJECT, ENV_NAME)
@@ -61,6 +67,15 @@ def test_rotate_password(vault):
     vault.rotate_password("n3wP@ss!", PROJECT, ENV_NAME)
     result = vault.pull(PROJECT, ENV_NAME)
     assert result == SAMPLE_ENV
+
+
+def test_rotate_password_old_password_no_longer_works(vault):
+    """After rotating, the old password should not decrypt the env."""
+    vault.push(PROJECT, ENV_NAME, SAMPLE_ENV)
+    vault.rotate_password("n3wP@ss!", PROJECT, ENV_NAME)
+    old_vault = Vault(PASSWORD, store_dir=vault.store_dir)
+    with pytest.raises(Exception):
+        old_vault.pull(PROJECT, ENV_NAME)
 
 
 def test_rotate_to_empty_password_raises(vault):
