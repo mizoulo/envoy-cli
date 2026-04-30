@@ -27,8 +27,13 @@ class Config:
     def _load(self) -> None:
         """Load config from disk, falling back to defaults."""
         if self.config_path.exists():
-            with open(self.config_path, "r", encoding="utf-8") as f:
-                stored = json.load(f)
+            try:
+                with open(self.config_path, "r", encoding="utf-8") as f:
+                    stored = json.load(f)
+            except json.JSONDecodeError as e:
+                raise ValueError(
+                    f"Config file at {self.config_path} contains invalid JSON: {e}"
+                ) from e
             self._data = {**DEFAULT_CONFIG, **stored}
         else:
             self._data = dict(DEFAULT_CONFIG)
