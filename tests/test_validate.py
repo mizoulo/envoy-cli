@@ -80,3 +80,14 @@ def test_issue_repr():
     issue = ValidationIssue("MY_KEY", "Some problem.", "error")
     assert "ERROR" in repr(issue)
     assert "MY_KEY" in repr(issue)
+
+
+def test_multiple_missing_required_keys_all_reported():
+    """All missing required keys should appear in issues, not just the first."""
+    env = ""  # no keys at all
+    result = validate_env(env, SCHEMA)
+    assert result.valid is False
+    error_keys = [i.key for i in result.issues if i.severity == "error"]
+    assert "DB_HOST" in error_keys
+    assert "DB_PORT" in error_keys
+    assert "SECRET_KEY" in error_keys
