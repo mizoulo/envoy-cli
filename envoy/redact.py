@@ -27,6 +27,10 @@ class RedactResult:
     def __repr__(self) -> str:  # pragma: no cover
         return f"RedactResult({self.summary})"
 
+    def to_string(self) -> str:
+        """Return the redacted lines joined as a single string."""
+        return "\n".join(self.lines)
+
 
 def _is_sensitive(key: str) -> bool:
     """Return True if the key name matches any sensitive pattern."""
