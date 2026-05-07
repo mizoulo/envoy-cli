@@ -71,6 +71,13 @@ def lint_env(source: str, path: str = "<string>") -> LintResult:
         if value.startswith((" ", "\t")):
             result.issues.append(LintIssue(line_no, "W002", f"Value for {key!r} has leading whitespace"))
 
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):
+            inner = value[1:-1]
+            if value[0] in inner:
+                result.issues.append(
+                    LintIssue(line_no, "W003", f"Value for {key!r} contains unescaped quote character")
+                )
+
     return result
 
 
