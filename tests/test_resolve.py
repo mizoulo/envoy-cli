@@ -89,3 +89,9 @@ def test_resolve_result_success_false_when_cycle():
 def test_resolve_result_success_false_when_error():
     result = ResolveResult(error="something went wrong")
     assert not result.success
+
+
+def test_resolve_missing_reference_success_is_false():
+    """A missing variable reference should mark the result as not fully successful."""
+    result = resolve_env(MISSING_REF)
+    assert not result.success
